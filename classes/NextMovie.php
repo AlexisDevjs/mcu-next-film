@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+require_once 'lib/functions.php';
 
 class NextMovie
 {
@@ -15,20 +16,14 @@ class NextMovie
 
   static function fetch_and_create(string $api_url)
   {
-    $context = stream_context_create([
-      "ssl" => [
-        "verify_peer" => false,
-        "verify_peer_name" => false,
-      ]
-    ]);
-
-    $response = file_get_contents($api_url, false, $context);
+    $response = file_get_contents($api_url);
     $data = json_decode($response, true);
+    $translated_overview = translate_text($data["overview"], 'es');
 
     return new self(
       $data["title"],
       $data["poster_url"],
-      $data["overview"],
+      $translated_overview,
       $data["days_until"],
       $data["release_date"],
       [
